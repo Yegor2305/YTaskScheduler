@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .forms import SignUpForm, SignInForm
-from .models import User
 
 # Create your views here.
 def sign_in(request):
