@@ -1,0 +1,10 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block style %} <link rel="stylesheet" href="{% static 'css/main/personal_page.css' %}"> {% endblock %}
+{% block title %} {{ title }} {% endblock %}
+
+{% block content %}  
+    <h1>Hello, {{user}} </h1>
+
+{% endblock %}
