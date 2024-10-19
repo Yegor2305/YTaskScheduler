@@ -1,5 +1,4 @@
 from django.db import models
-from datetime import date
 from accounts.models import User
 
 # Create your models here.

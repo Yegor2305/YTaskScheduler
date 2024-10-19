@@ -13,13 +13,6 @@ class CustomUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
-    def create_superuser(self, login, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_admin', True)
-        extra_fields.setdefault('is_superuser', True)
-
-        return self.create_user(login, password, **extra_fields)
 
 class User(AbstractBaseUser):
     name = models.CharField(max_length=100)
@@ -56,22 +49,4 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return f"{self.name} {self.last_name}"
-
-# class User(models.Model):
-#     name = models.CharField(max_length=100)
-#     last_name = models.CharField(max_length=100)
-#     login = models.CharField(max_length=128, unique=True, null=False)
-#     password = models.CharField(max_length=128, null=False)
-#     email = models.CharField(max_length=128)
-#     register_date = models.DateTimeField(auto_now_add=True)
-#     last_login = models.DateTimeField(null=True, blank=True)
-#     is_active = models.BooleanField(default=True) 
-
-#     def set_password(self, input_password):
-#         self.password = make_password(input_password)
-
-#     def check_password(self, input_password):
-#         return check_password(input_password, self.password)
-
-#     def __str__(self):
-#         return f"{self.name} {self.last_name}"
+    
