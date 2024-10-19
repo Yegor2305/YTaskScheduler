@@ -20,7 +20,7 @@ def personal_page(request):
     if request.user.is_superuser:
         return redirect("sign-in")
 
-    return render(request, 'main/personal_page.html', {"title": f"{request.user} | Tasks", "user": request.user})
+    return render(request, 'main/tasks.html', {"title": f"{request.user} | Tasks", "user": request.user})
 
 def another(request):
     return render(request, 'main/about.html', {"title": "About"})
