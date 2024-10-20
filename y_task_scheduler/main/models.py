@@ -1,3 +1,4 @@
+from django.core import signing
 from django.db import models
 from accounts.models import User
 
@@ -12,6 +13,9 @@ class Task(models.Model):
     is_completed = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tasks")
     resources = models.ManyToManyField('Resource', through="TaskResources", related_name="tasks")
+
+    def get_encrypted_id(self):
+        return signing.dumps(self.id)
 
     def __str__(self):
         return f"{self.name}"
@@ -42,6 +46,9 @@ class TaskResources(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
     amount = models.IntegerField(default=1)
+
+    class Meta:
+        unique_together = (('task', 'resource'))
 
     def __str__(self):
         return f"{self.task} - {self.resource}"

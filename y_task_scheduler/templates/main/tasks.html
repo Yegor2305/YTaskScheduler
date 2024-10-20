@@ -14,5 +14,34 @@
         <a href="" class="menu-item">Add Groups</a>
         <a href="" class="menu-item">Watch All</a>
     </div>
+    <div class="info-container">
+        <div class="today-tasks-container">
+            <div class="date-field">{{date}}</div>
+            <span class="separator first"></span>
+            {% if tasks %}
+                {% for task in tasks %}
+                    <div class="task-field-wrapper" id="{{task}}">
+                        <a class="task-field" href="">
+                            <div class="priority">{{ task.priority }}</div>
+                            <div class="task-name">{{ task.name }}</div>
+                            <div class="end-time">
+                                <img src="{% static 'main/icons/time.png' %}" alt="time">
+                                {{task.time_end}}
+                            </div>
+                        </a>
+                        <a href="{% url 'delete-task' encrypted_id=task.get_encrypted_id %}">Delete</a>
+                        <!-- <a href=""> |<strong> <big> </big> </strong> |  </a> -->
+                    </div>
+                    <span class="separator"></span>
+                    
+                {% endfor %}
+            {% endif %}
+            
+
+        </div>
+        <div class="groups-container">
+            
+        </div>
+    </div>
 
 {% endblock %}

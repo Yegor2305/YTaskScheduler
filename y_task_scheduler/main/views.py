@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from django.utils.functional import SimpleLazyObject
-from .models import User
+from django.core import signing
+from django.db import models
+from .models import Task
+from datetime import date
 
 # Create your views here.
 def index(request):
@@ -18,9 +20,38 @@ def log_out(request):
 @login_required
 def personal_page(request):
     if request.user.is_superuser:
+        logout(request=request)
         return redirect("sign-in")
 
-    return render(request, 'main/tasks.html', {"title": f"{request.user} | Tasks", "user": request.user})
+    tasks = None
+    try:
+        tasks = Task.objects.filter(user = request.user, date = date.today()).order_by("priority")
+    except:
+        pass
+
+    context = {
+        "title": f"{request.user} | Tasks",
+        "user": request.user,
+        "tasks": tasks,
+        "date": date.today()
+    }
+
+    return render(request, 'main/tasks.html', context=context)
+
+@login_required
+def delete_task(request, encrypted_id):
+    try:
+        task_id = signing.loads(encrypted_id)
+    except signing.BadSignature:
+        raise Http404("Task not found")
+    
+    task = get_object_or_404(Task, id=task_id)
+        
+    if task.user != request.user:
+        raise Http404("Task not found")
+
+    task.delete()
+    return redirect('account')
 
 def another(request):
     return render(request, 'main/about.html', {"title": "About"})
