@@ -3,7 +3,7 @@ from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.core import signing
-from django.db import models
+from django.http import JsonResponse
 from .models import Task
 from datetime import date
 
@@ -25,7 +25,7 @@ def personal_page(request):
 
     tasks = None
     try:
-        tasks = Task.objects.filter(user = request.user, date = date.today()).order_by("priority")
+        tasks = Task.objects.filter(user = request.user).order_by("priority") #, date = date.today()
     except:
         pass
 
@@ -33,25 +33,25 @@ def personal_page(request):
         "title": f"{request.user} | Tasks",
         "user": request.user,
         "tasks": tasks,
+        "choosen_task": tasks[0] if tasks else None,
         "date": date.today()
     }
 
-    return render(request, 'main/tasks.html', context=context)
-
-@login_required
-def delete_task(request, encrypted_id):
-    try:
-        task_id = signing.loads(encrypted_id)
-    except signing.BadSignature:
-        raise Http404("Task not found")
-    
-    task = get_object_or_404(Task, id=task_id)
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        action = request.GET.get("action")
+        try:
+            task = get_object_or_404(Task, id=signing.loads(request.GET.get("task_id")))
+        except signing.BadSignature:
+            raise Http404("Task not found")
         
-    if task.user != request.user:
-        raise Http404("Task not found")
-
-    task.delete()
-    return redirect('account')
+        if action == "delete":
+            task.delete()
+            return JsonResponse({'status': 'success'})
+        if action == "show":
+            if context["choosen_task"] != task:
+                context["choosen_task"] = task
+                
+    return render(request, 'main/tasks.html', context=context)
 
 def another(request):
     return render(request, 'main/about.html', {"title": "About"})

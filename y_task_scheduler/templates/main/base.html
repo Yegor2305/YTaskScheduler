@@ -11,30 +11,30 @@
     <title>{% block title %} {% endblock %}</title>
 </head>
 <body>
-    <div class="header">
-        <div class="header-container">
-            <div class="left-part">
-                <div class="icon">Y</div>
-                <nav class="nav-panel">
-                    <a href="{% url 'home' %}">Home</a>
-                    <span>|</span>
-                    <a href="{% url 'about' %}">About</a>
-                    <span>|</span>
-                    <a href="{% url 'account' %}">Tasks</a>
+    <div class="container">
+        <div class="header">
+            <div class="header-container">
+                <div class="left-part">
+                    <div class="icon">Y</div>
+                    <nav class="nav-panel">
+                        <a href="{% url 'home' %}">Home</a>
+                        <span>|</span>
+                        <a href="{% url 'about' %}">About</a>
+                        <span>|</span>
+                        <a href="{% url 'tasks' %}">Tasks</a>
+                    </nav>
+                </div>
+                <nav class="auth-panel">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'log-out' %}">Log Out</a>
+                    {% else %}
+                        <a href="{% url 'sign-in' %}">Sign In</a>
+                        <span>|</span>
+                        <a href="{% url 'sign-up' %}">Sign Up</a>
+                    {% endif %}
                 </nav>
             </div>
-            <nav class="auth-panel">
-                {% if request.user.is_authenticated %}
-                    <a href="{% url 'log-out' %}">Log Out</a>
-                {% else %}
-                    <a href="{% url 'sign-in' %}">Sign In</a>
-                    <span>|</span>
-                    <a href="{% url 'sign-up' %}">Sign Up</a>
-                {% endif %}
-            </nav>
         </div>
-    </div>
-    <div class="container">
     {% block content %} {% endblock %}
     </div> 
 </body>

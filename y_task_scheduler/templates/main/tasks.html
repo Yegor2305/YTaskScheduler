@@ -4,43 +4,68 @@
 {% block style %} <link rel="stylesheet" href="{% static 'main/css/tasks.css' %}"> {% endblock %}
 
 {% load static %}
-{% block script %} <script src="{% static 'main/js/script.js' %}" defer></script> {% endblock %}
+{% block script %} 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="{% static 'main/js/script.js' %}" defer></script> 
+{% endblock %}
 {% block title %} {{ title }} {% endblock %}
 
 {% block content %}  
-    <div class="left-side-menu">
-        <a href="" class="menu-item">Add Task</a>
-        <a href="" class="menu-item">Add Resources</a>
-        <a href="" class="menu-item">Add Groups</a>
-        <a href="" class="menu-item">Watch All</a>
-    </div>
-    <div class="info-container">
-        <div class="today-tasks-container">
-            <div class="date-field">{{date}}</div>
-            <span class="separator first"></span>
-            {% if tasks %}
-                {% for task in tasks %}
-                    <div class="task-field-wrapper" id="{{task}}">
-                        <a class="task-field" href="">
-                            <div class="priority">{{ task.priority }}</div>
-                            <div class="task-name">{{ task.name }}</div>
-                            <div class="end-time">
-                                <img src="{% static 'main/icons/time.png' %}" alt="time">
-                                {{task.time_end}}
-                            </div>
-                        </a>
-                        <a href="{% url 'delete-task' encrypted_id=task.get_encrypted_id %}">Delete</a>
-                        <!-- <a href=""> |<strong> <big> </big> </strong> |  </a> -->
-                    </div>
-                    <span class="separator"></span>
-                    
-                {% endfor %}
-            {% endif %}
-            
-
+    <div class="content">
+        <div class="left-side-menu">
+            <a href="" class="menu-item">Add Task</a>
+            <a href="" class="menu-item">Add Resources</a>
+            <a href="" class="menu-item">Add Groups</a>
+            <a href="" class="menu-item">Watch All</a>
         </div>
-        <div class="groups-container">
-            
+        <div class="info-container">
+            <div class="today-tasks-container">
+                <div class="today-tasks-container-header">
+                    <div class="date-field">{{date}}</div>
+                    <div class="add-task-button">+</div>
+                </div>
+                <span class="separator first"></span>
+                <div class="tasks-wrapper">
+                    {% if tasks %}
+                        {% for task in tasks %}
+                            <div class="task-field-wrapper" id="{{task}}">
+                                <a class="task-field" href="">
+                                    <div class="priority">{{ task.priority }}</div>
+                                    <div class="task-name"><span class="task-name-content">{{ task.name }}</span></div>
+                                    <div class="end-time">
+                                        <img src="{% static 'main/icons/time.png' %}" alt="time">
+                                        {{task.time_end}}
+                                    </div>
+                                </a>
+                                <div class="buttons-block">
+                                    <button type="button" class="show-task-button" data-task-id="{{ task.get_encrypted_id }}">
+                                        <img src="{% static 'main/icons/show.png' %}" alt="show">
+                                    </button>
+                                    <button type="button" class="edit-task-button" data-task-id="{{ task.get_encrypted_id }}">
+                                        <img src="{% static 'main/icons/edit.png' %}" alt="show">
+                                    </button>
+                                    <button type="button" class="delete-task-button" data-task-id="{{ task.get_encrypted_id }}">
+                                        <img src="{% static 'main/icons/delete.png' %}" alt="show">
+                                    </button>
+                                </div>
+                                <!-- <a href=""> |<strong> <big> </big> </strong> |  </a> -->
+                            </div>
+                            <span class="separator"></span>
+                            
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="choosen-task-container">
+                {% if choosen_task %}
+                    <h1> {{choosen_task.name}} </h1>
+                {% else %}
+                    <h1>No tasks</h1>
+                {% endif %}
+            </div>
+            <!-- <div class="groups-container"> -->
+                
+            </div>
         </div>
     </div>
 

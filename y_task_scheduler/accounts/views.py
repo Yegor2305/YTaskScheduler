@@ -12,7 +12,7 @@ def sign_in(request):
             user = authenticate(request, login=login_input, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('account')
+                return redirect('tasks')
             else:
                 form.add_error(None, "Invalid login or password")
                 
