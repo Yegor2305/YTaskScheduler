@@ -163,3 +163,4 @@ cython_debug/
 #.idea/
 y_task_scheduler/accounts/__pycache__/models.cpython-312.pyc
 y_task_scheduler/main/__pycache__/models.cpython-312.pyc
+test.py
