@@ -17,7 +17,7 @@ $(document).ready(
             }           
         })
 
-        $('.show-task-button').click(function(){
+        $('.task-field').click(function(){
             let taskId = $(this).data('task-id');
             $.ajax({
                 url: '/tasks',
@@ -27,34 +27,26 @@ $(document).ready(
                     'task_id': taskId
                 },
                 success: function(response) {
-                    $('body').html(response);
+                    $('#choosen-task-name').text(response.name)
+                    $('.choosen-task-description-content').text(response.description)
                 }
             })
         })
     }
 )
 
-document.querySelectorAll('.task-name-content').forEach((element) => {
-        const contentWidth = element.clientWidth
-        const taskNameWidth = document.querySelector('.task-name').clientWidth
+document.querySelectorAll('.scrollable').forEach((element) => {
+    const contentWidth = element.clientWidth
+    const containerWidth = element.parentElement.clientWidth
 
-        if (contentWidth > taskNameWidth){
-            element.addEventListener('mouseenter', () => {
-                element.classList.add('scroll')
-            })
+    if (contentWidth > containerWidth){
+        element.addEventListener('mouseenter', () => {
+            element.classList.add('scroll')
+        })
 
-            element.addEventListener('mouseleave', () => {
-                element.classList.remove('scroll')
-            })
-            
-        }
-        // element.addEventListener('mouseenter', () =>{
-        //     const contentWidth = element.scrollWidth
-        //     const visibleWidth = element.clientWidth
-
-        //     if (contentWidth > visibleWidth){
-        //         element.style.transform = `translateX(-${visibleWidth - contentWidth}px)`;
-        //         console.log(element.style.transform)
-        //     }   
-        // })
-    })
+        element.addEventListener('mouseleave', () => {
+            element.classList.remove('scroll')
+        })
+        
+    }
+})

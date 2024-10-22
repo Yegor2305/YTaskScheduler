@@ -17,30 +17,39 @@
             <a href="" class="menu-item">Add Resources</a>
             <a href="" class="menu-item">Add Groups</a>
             <a href="" class="menu-item">Watch All</a>
+            <form method="get" class="menu-item">
+                <label for="date">Date: </label>
+                <input type="date" name="date" id="date" onchange="this.form.submit()" value="{{ date|date:'Y-m-d' }}">
+            </form>
         </div>
         <div class="info-container">
             <div class="today-tasks-container">
                 <div class="today-tasks-container-header">
-                    <div class="date-field">{{date}}</div>
-                    <div class="add-task-button">+</div>
+                    <div class="date-field">{{ date|date:"M. d, Y" }}</div>
+                    <button type="button" class="add-task-button">+</button>
                 </div>
                 <span class="separator first"></span>
                 <div class="tasks-wrapper">
                     {% if tasks %}
                         {% for task in tasks %}
-                            <div class="task-field-wrapper" id="{{task}}">
-                                <a class="task-field" href="">
-                                    <div class="priority">{{ task.priority }}</div>
-                                    <div class="task-name"><span class="task-name-content">{{ task.name }}</span></div>
+                            <div class="task-field-wrapper {% if task.is_completed %} completed-task {% endif %}">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="request_name" value="change_task_state">
+                                    <input type="hidden" name="task_id" value="{{ task.get_encrypted_id }}">
+                                    <input type="checkbox" name="task_state" onchange="this.form.submit()"
+                                    value="{% if task.is_completed %}1{%else%}0{% endif %}"
+                                    {% if task.is_completed %} checked {% endif %}>
+                                </form>
+                                <button type="button" class="task-field" data-task-id="{{ task.get_encrypted_id }}">
+                                    <div class="task-name"><span class="task-name-content scrollable">{{ task.name }}</span></div>
                                     <div class="end-time">
                                         <img src="{% static 'main/icons/time.png' %}" alt="time">
                                         {{task.time_end}}
                                     </div>
-                                </a>
+                                </button>
                                 <div class="buttons-block">
-                                    <button type="button" class="show-task-button" data-task-id="{{ task.get_encrypted_id }}">
-                                        <img src="{% static 'main/icons/show.png' %}" alt="show">
-                                    </button>
+                                    
                                     <button type="button" class="edit-task-button" data-task-id="{{ task.get_encrypted_id }}">
                                         <img src="{% static 'main/icons/edit.png' %}" alt="show">
                                     </button>
@@ -50,22 +59,35 @@
                                 </div>
                                 <!-- <a href=""> |<strong> <big> </big> </strong> |  </a> -->
                             </div>
-                            <span class="separator"></span>
-                            
+                            <span class="separator"></span>               
                         {% endfor %}
+                    {% else %}
+                        <h1>No tasks for this day</h1>
                     {% endif %}
                 </div>
             </div>
             <div class="choosen-task-container">
-                {% if choosen_task %}
-                    <h1> {{choosen_task.name}} </h1>
-                {% else %}
-                    <h1>No tasks</h1>
-                {% endif %}
+                <div class="choosen-task-container-header">
+                    <div id="choosen-task-name">
+                        {% if choosen_task %}
+                            {{choosen_task.name}}
+                        {% else %}
+                            No tasks
+                        {% endif %}
+                    </div>
+                </div>
+                <span class="separator first"></span>
+                <div class="choosen-task-info-container">
+                    {% if choosen_task %}
+                        <div class="choosen-task-description">Description:                   
+                            <div class="choosen-task-description-content">{{choosen_task.description}}</div>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-            <!-- <div class="groups-container"> -->
+            <!-- <div class="right-side-menu">
                 
-            </div>
+            </div> -->
         </div>
     </div>
 
