@@ -1,6 +1,25 @@
 $(document).ready(
     function(){
-        $('.delete-task-button').click(function(){
+        $(document).on('change', '.change-task-state-checkbox', function(){
+            let taskId = $(this).data('task-id');
+            let taskState = this.checked;  
+            console.log(taskState)
+            $.ajax({
+                url: '/tasks',
+                method: 'GET',
+                data: {
+                    'action': 'change_task_state',
+                    'task_id': taskId,
+                    'task_state': taskState
+                },
+                success: function(response) {
+                    $('.today-tasks-container').html(response)
+                }
+            })
+                       
+        })
+
+        $(document).on('click', '.delete-task-button', function(){
             let taskId = $(this).data('task-id');
             if (confirm('Are you sure to delete task?')) {
                 $.ajax({
@@ -11,13 +30,13 @@ $(document).ready(
                         'task_id': taskId
                     },
                     success: function(response) {
-                        location.reload();
+                        $('.today-tasks-container').html(response)
                     }
                 })
             }           
         })
 
-        $('.task-field').click(function(){
+        $(document).on('click', '.task-field', function(){
             let taskId = $(this).data('task-id');
             $.ajax({
                 url: '/tasks',
@@ -27,8 +46,7 @@ $(document).ready(
                     'task_id': taskId
                 },
                 success: function(response) {
-                    $('#choosen-task-name').text(response.name)
-                    $('.choosen-task-description-content').text(response.description)
+                    $('.choosen-task-container').html(response)
                 }
             })
         })

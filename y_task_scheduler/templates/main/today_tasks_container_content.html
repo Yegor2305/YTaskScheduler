@@ -1,0 +1,44 @@
+{% load static %}
+<div class="today-tasks-container-header">
+    <div class="date-field">{{ date|date:"M. d, Y" }}</div>
+    <button type="button" class="add-task-button">+</button>
+</div>
+<span class="separator first"></span>
+<div class="tasks-wrapper">
+    {% if tasks %}
+        {% for task in tasks %}
+            <div class="task-field-wrapper {% if task.is_completed %} completed-task {% endif %}">
+                <!-- <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="request_name" value="change_task_state">
+                    <input type="hidden" name="task_id" value="{{ task.get_encrypted_id }}">
+                    <input type="checkbox" name="task_state" onchange="this.form.submit()"
+                    value="{% if task.is_completed %}1{%else%}0{% endif %}"
+                    {% if task.is_completed %} checked {% endif %}>
+                </form> -->
+                <input type="checkbox" name="change-task-state-checkbox" class="change-task-state-checkbox"
+                    data-task-id="{{ task.get_encrypted_id }}"
+                    {% if task.is_completed %} checked {% endif %}>
+                <button type="button" class="task-field" data-task-id="{{ task.get_encrypted_id }}">
+                    <div class="task-name"><span class="task-name-content scrollable">{{ task.name }}</span></div>
+                    <div class="end-time">
+                        <img src="{% static 'main/icons/time.png' %}" alt="time">
+                        {{task.time_end}}
+                    </div>
+                </button>
+                <div class="buttons-block">
+                    
+                    <button type="button" class="edit-task-button" data-task-id="{{ task.get_encrypted_id }}">
+                        <img src="{% static 'main/icons/edit.png' %}" alt="show">
+                    </button>
+                    <button type="button" class="delete-task-button" data-task-id="{{ task.get_encrypted_id }}">
+                        <img src="{% static 'main/icons/delete.png' %}" alt="show">
+                    </button>
+                </div>
+            </div>
+            <span class="separator"></span>               
+        {% endfor %}
+    {% else %}
+        <h1>No tasks for this day</h1>
+    {% endif %}
+</div>

@@ -25,12 +25,15 @@ def get_default_group():
         return None
 
 class Task(models.Model):
+    
+    PRIORITY_CHOICES = [(1, 'Hight'), (2, 'Medium'), (3, 'Low')]
+
     name = models.CharField(max_length=100)
     description = models.TextField()
-    date = models.DateField(auto_now=True)
+    date = models.DateField()
     time_start = models.TimeField()
     time_end = models.TimeField()
-    priority = models.IntegerField()
+    priority = models.IntegerField(choices=PRIORITY_CHOICES)
     is_completed = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tasks")
     group = models.ForeignKey(Group, on_delete=models.SET_DEFAULT, related_name="tasks", default=get_default_group)
