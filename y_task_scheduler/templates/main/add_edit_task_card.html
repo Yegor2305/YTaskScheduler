@@ -1,0 +1,84 @@
+<form id="add-task-form" method="POST">
+    {% csrf_token %}
+    <div class="task-info-container-header">
+        <input id="task-info-name" type="text" name="task-name" placeholder="Name">        
+        <div id="task-info-priority">
+            <select class="task-info-item-content" name="task-priority-select" id="task-priority-select">
+                {% for pr_num, pr_val in priorities %}
+                    <option value="{{ pr_num }}">{{ pr_val }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <span class="separator first"></span>
+    <div class="task-info-container">    
+        <div class="task-info-description task-info-item">
+            <div class="task-info-header">Description: </div>                  
+            
+            <textarea class="task-info-description-content task-info-item-content" 
+            name="task-description" id="task-description" placeholder="Description"></textarea>
+
+        </div>
+
+        <div class="task-info-resources task-info-item">
+            <div class="task-info-header">Resources: </div>
+            <div class="task-info-resources-content task-info-item-content">            
+            </div>
+        </div>
+        <div class="task-info-item">
+            <div class="task-info-header">Resource: </div>
+            <div class="task-info-item-content resources-edit">
+                <div class="resource-first-column">
+                    <select name="resource-select" id="resource-select">
+                        {% if resources %}
+                            {% for resource in resources %}
+                                <option value="{{ resource.get_encrypted_id }}">{{ resource.name }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="None">No resource</option>
+                        {% endif %}
+                    </select>
+                    <button type="button" onclick="addResourceForTask()">+</button>
+                </div>
+                <div class="resource-second-column">       
+                    <div>
+                        <label for="resource-count">Count:</label>
+                        <input type="number" name="resource-count" id="resource-count" min="1" max="100" value="1">
+                    </div>
+                    <button type="button" onclick="removeResourceFromTask()">-</button>
+                </div>      
+            </div>
+        </div>
+        
+        <div class="task-info-group task-info-item">
+            <div class="task-info-header">Group: </div>        
+            <select class="task-info-group-content task-info-item-content" name="task-group-select" id="task-group-select">
+                {% if groups %}
+                    {% for group in groups %}
+                        <option value="group.get_encrypted_id">{{ group }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="None">No group</option>
+                {% endif %}
+            </select>      
+        </div>
+        <div class="task-info-time task-info-item">
+            <div class="task-info-header">Time: </div>
+            
+                <div class="task-time-container task-info-item-content">
+                    <div class="item">
+                        <label for="task-time-start">From:</label>
+                        <input type="time" name="task-time-start" id="task-time-start">
+                    </div>
+                    <div class="item">
+                        <label for="task-time-end">To:</label>
+                        <input type="time" name="task-time-end" id="task-time-end">
+                    </div>
+                    
+                    
+                </div>
+            
+        </div>     
+    </div>
+    <button id="submit-adding-task-button" type="submit">Save Task</button>
+</form>

@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.core import signing
-from django.http import JsonResponse
-from .models import Task
+from .models import Task, Resource, TaskResources
+from .forms import temp_resources_for_task as trft
 import datetime as dt
 
 # Create your views here.
@@ -26,12 +26,28 @@ def personal_page(request):
 
     current_time = dt.datetime.now()
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+
         action = request.GET.get("action")
-        try:
-            task = get_object_or_404(Task, id=signing.loads(request.GET.get("task_id")))
-        except signing.BadSignature:
-            raise Http404("Task not found")
-        date = task.date
+
+        if action == "add_resource_for_task" or action == "remove_resource_from_task":
+            resource = Resource.objects.get(id=signing.loads(request.GET.get("resource_id")))
+            if action == "add_resource_for_task":
+                resource_count = request.GET.get("resource_count")  
+                trft[resource] = resource_count
+            else:
+                trft.pop(resource, None)
+            return JsonResponse({
+                "resources_label": ', '.join([f'{resource.name} ({quantity})' for resource, quantity in trft.items()])
+                })
+        
+        task = None
+        date = None
+        if action != "add_task":
+            try:
+                task = get_object_or_404(Task, id=signing.loads(request.GET.get("task_id")))
+            except signing.BadSignature:
+                raise Http404("Task not found")
+            date = task.date
 
         if action == "change_task_state" or action == "delete":
               
@@ -50,23 +66,67 @@ def personal_page(request):
                 html = render_to_string('main/choosen_task_container_content.html', 
                                         {'choosen_task': task, "current_time": current_time, "date": date})
                 return HttpResponse(html)
+            if action == "add_task":
+                trft.clear()
+                priorities = Task.PRIORITY_CHOICES
+                groups = request.user.groups.all()
+                resources = request.user.resources.all() 
+                html = render_to_string(request=request, template_name='main/add_edit_task_card.html', context=
+                                        {'resources': resources, 'priorities': priorities, 'groups': groups})
+                return HttpResponse(html)
+            
     else:
-        date = request.GET.get("date")
-        date = dt.datetime.strptime(date, '%Y-%m-%d').date() if date else dt.date.today()
-        try:
-            tasks = get_tasks(request.user, date)
-        except:
-            pass
-        context = {
-            "title": f"{request.user} | Tasks",
-            "user": request.user,
-            "tasks": tasks,
-            "choosen_task": tasks[0] if tasks else None,
-            "date": date,
-            "current_time": current_time
-        }
+        if request.method == "POST":
+            
+            name = request.POST.get("task-name")
+            name = name if name.strip() != '' else "nameless task"
+            group = request.POST.get("task-group-select")
+            group = group if group != "None" else None
+            time_start = request.POST.get("task-time-start") if request.POST.get("task-time-start") != '' else dt.datetime.now().time()
+            time_end = request.POST.get("task-time-end") if request.POST.get("task-time-end") != '' else time_start
+            if time_start > time_end:
+                time_start, time_end = time_end, time_start
+            new_task = Task(
+                name = name,
+                description = request.POST.get("task-description"),
+                priority = request.POST.get("task-priority-select"),
+                date = request.session.get("date"),
+                user = request.user,
+                time_start = time_start,
+                time_end = time_end,
+                group = group,
+            )
+            new_task.save()
+
+            for resource, amount in trft.items():
+                task_resource = TaskResources(
+                    task = new_task,
+                    resource = resource,
+                    amount = amount
+                )
+                task_resource.save()
+
+            return redirect("tasks")
+        
+        else:
+            date = request.GET.get("date")
+            date = request.session.get("date") if not date else date
+            date = dt.datetime.strptime(date, '%Y-%m-%d').date() if date else dt.date.today()
+            request.session["date"] = date.strftime("%Y-%m-%d")
+            try:
+                tasks = get_tasks(request.user, date)
+            except:
+                pass
+            context = {
+                "title": f"{request.user} | Tasks",
+                "user": request.user,
+                "tasks": tasks,
+                "choosen_task": tasks[0] if tasks else None,
+                "date": date,
+                "current_time": current_time
+            }
                 
-    return render(request, 'main/tasks.html', context=context)
+            return render(request, 'main/tasks.html', context=context)
 
 def another(request):
     return render(request, 'main/about.html', {"title": "About"})

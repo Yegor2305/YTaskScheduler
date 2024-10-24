@@ -1,5 +1,5 @@
-<div class="choosen-task-container-header">
-    <div id="choosen-task-name">
+<div class="task-info-container-header">
+    <div id="task-info-name">
         {% if choosen_task %}
             {{choosen_task.name}}
         {% else %}
@@ -8,15 +8,15 @@
     </div>
 </div>
 <span class="separator first"></span>
-<div class="choosen-task-info-container">
+<div class="task-info-container">
     {% if choosen_task %}
-        <div class="choosen-task-description choosen-task-info-item">
-            <div class="choosen-task-info-header">Description: </div>                  
-            <div class="choosen-task-description-content choosen-task-info-item-content">{{choosen_task.description}}</div>
+        <div class="task-info-description task-info-item">
+            <div class="task-info-header">Description: </div>                  
+            <div class="task-info-description-content task-info-item-content">{{choosen_task.description}}</div>
         </div>
-        <div class="choosen-task-resources choosen-task-info-item">
-            <div class="choosen-task-info-header">Resources: </div>
-            <div class="choosen-task-resources-content choosen-task-info-item-content">
+        <div class="task-info-resources task-info-item">
+            <div class="task-info-header">Resources: </div>
+            <div class="task-info-resources-content task-info-item-content">
                 {% if choosen_task.resources.all %}
                     {% for resource in choosen_task.resources.all %}
                         <a href="">{{ resource }}{% if not forloop.last %}, {% endif %}</a>
@@ -26,17 +26,20 @@
                 {% endif %}
             </div>
         </div>
-        <div class="choosen-task-group choosen-task-info-item">
-            <div class="choosen-task-info-header">Group: </div>
-            <div class="choosen-task-group-content choosen-task-info-item-content">
-                <a href="">{{ choosen_task.group }}</a>
+        <div class="task-info-group task-info-item">
+            <div class="task-info-header">Group: </div>
+            <div class="task-info-group-content task-info-item-content">
+                {% if choosen_task.group %}
+                    <a href="">{{ choosen_task.group }}</a>
+                {% else %}
+                    No group
+                {% endif %}
             </div>
         </div>
-        <div class="choosen-task-time choosen-task-info-item">
-            <div class="choosen-task-info-header">Time: </div>
-            <div class="choosen-task-time-content choosen-task-info-item-content">
-                <!-- {{ current_time.time }} -->
-                {% if  current_time.date > choosen_task.date and current_time.time > choosen_task.time_end %} 
+        <div class="task-info-time task-info-item">
+            <div class="task-info-header">Time: </div>
+            <div class="task-info-time-content task-info-item-content">
+                {% if current_time.date > choosen_task.date or current_time.time > choosen_task.time_end %}         
                     <span style="color: red;">!</span> 
                 {% endif %}
                 {{ choosen_task.time_start }} - {{ choosen_task.time_end }}

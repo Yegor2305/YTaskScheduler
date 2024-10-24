@@ -28,7 +28,7 @@ class SignUpForm(ModelForm):
         repeat_password = cleaned_data.get("repeat_password")
 
         if password and repeat_password and password != repeat_password:
-            self.add_error('repeat_password', "Пароли не совпадают")
+            self.add_error('repeat_password', "Passwords do not match")
 
     def save(self, commit=True):
         user = super().save(commit=False)

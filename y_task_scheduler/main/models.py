@@ -14,6 +14,10 @@ class Group(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name="groups")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="groups")
+
+    def get_encrypted_id(self):
+        return signing.dumps(self.id)
 
     def __str__(self):
         return f"{self.name}"
@@ -25,7 +29,7 @@ def get_default_group():
         return None
 
 class Task(models.Model):
-    
+
     PRIORITY_CHOICES = [(1, 'Hight'), (2, 'Medium'), (3, 'Low')]
 
     name = models.CharField(max_length=100)
@@ -36,7 +40,7 @@ class Task(models.Model):
     priority = models.IntegerField(choices=PRIORITY_CHOICES)
     is_completed = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tasks")
-    group = models.ForeignKey(Group, on_delete=models.SET_DEFAULT, related_name="tasks", default=get_default_group)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, related_name="tasks", null=True, blank=True)
     resources = models.ManyToManyField('Resource', through="TaskResources", related_name="tasks")
 
     def get_encrypted_id(self):
@@ -49,6 +53,10 @@ class Resource(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     price = models.FloatField(default=0.0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="resources")
+
+    def get_encrypted_id(self):
+        return signing.dumps(self.id)
 
     def __str__(self):
         return f"{self.name}"

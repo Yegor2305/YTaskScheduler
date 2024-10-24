@@ -46,12 +46,61 @@ $(document).ready(
                     'task_id': taskId
                 },
                 success: function(response) {
-                    $('.choosen-task-container').html(response)
+                    $('.task-container').html(response)
+                }
+            })
+        })
+
+        $(document).on('click', '.add-task-button', function(){
+            $.ajax({
+                url: '/tasks',
+                method: 'GET',
+                data: {
+                    'action': 'add_task',
+                },
+                success: function(response) {
+                    $('.task-container').html(response);
                 }
             })
         })
     }
 )
+
+
+
+function addResourceForTask(){
+    let resourceSelect = $('#resource-select').val();
+    let resourceCount = $('#resource-count').val();
+    if (resourceSelect == "None") { return }
+    $.ajax({
+        url: '/tasks',
+        method: 'GET',
+        data: {
+            'action': 'add_resource_for_task',
+            'resource_id': resourceSelect,
+            'resource_count': resourceCount
+        },
+        success: function(response) {
+            $('.task-info-resources-content').text(response.resources_label);
+        }
+    })
+}
+
+function removeResourceFromTask(){
+    let resourceSelect = $('#resource-select').val();
+    if (resourceSelect == "None") { return }
+    $.ajax({
+        url: '/tasks',
+        method: 'GET',
+        data: {
+            'action': 'remove_resource_from_task',
+            'resource_id': resourceSelect,
+        },
+        success: function(response) {
+            $('.task-info-resources-content').text(response.resources_label);
+        }
+    })
+}
 
 document.querySelectorAll('.scrollable').forEach((element) => {
     const contentWidth = element.clientWidth
@@ -68,3 +117,28 @@ document.querySelectorAll('.scrollable').forEach((element) => {
         
     }
 })
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+$.ajaxSetup({
+  beforeSend: function(xhr, settings) {
+    if (!/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type) && !this.crossDomain) {
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    }
+  }
+});
