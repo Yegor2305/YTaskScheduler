@@ -66,48 +66,71 @@ def personal_page(request):
                 html = render_to_string('main/choosen_task_container_content.html', 
                                         {'choosen_task': task, "current_time": current_time, "date": date})
                 return HttpResponse(html)
-            if action == "add_task":
+            if action == "add_task" or action == "edit_task":
                 trft.clear()
                 priorities = Task.PRIORITY_CHOICES
                 groups = request.user.groups.all()
                 resources = request.user.resources.all() 
-                html = render_to_string(request=request, template_name='main/add_edit_task_card.html', context=
-                                        {'resources': resources, 'priorities': priorities, 'groups': groups})
+                context = {
+                    "resources": resources,
+                    "priorities": priorities,
+                    "groups": groups
+                }                                                     
+                if action == "edit_task":
+                    task_resources = task.taskresources_set.all()
+                    for task_res in task_resources:
+                        trft[task_res.resource] = task_res.amount
+                    context["task"] = task
+                    context["task_resources"] = task_resources
+                html = render_to_string(request=request, template_name='main/add_edit_task_card.html', context=context)
                 return HttpResponse(html)
             
     else:
         if request.method == "POST":
-            
+            task = None
             name = request.POST.get("task-name")
             name = name if name.strip() != '' else "nameless task"
             group = request.POST.get("task-group-select")
-            group = group if group != "None" else None
-            time_start = request.POST.get("task-time-start") if request.POST.get("task-time-start") != '' else dt.datetime.now().time()
-            time_end = request.POST.get("task-time-end") if request.POST.get("task-time-end") != '' else time_start
+            group = request.user.groups.get(id=signing.loads(group)) if group != "None" else None
+            
+            time_start = dt.datetime.strptime(request.POST.get("task-time-start"), "%H:%M").time() if request.POST.get("task-time-start") != '' else dt.datetime.now().time()
+            time_end = dt.datetime.strptime(request.POST.get("task-time-end"), "%H:%M").time() if request.POST.get("task-time-end") != '' else time_start
             if time_start > time_end:
                 time_start, time_end = time_end, time_start
-            new_task = Task(
-                name = name,
-                description = request.POST.get("task-description"),
-                priority = request.POST.get("task-priority-select"),
-                date = request.session.get("date"),
-                user = request.user,
-                time_start = time_start,
-                time_end = time_end,
-                group = group,
-            )
-            new_task.save()
+
+            if request.POST.get("action") == "add_task":             
+                task = Task(
+                    name = name,
+                    description = request.POST.get("task-description"),
+                    priority = request.POST.get("task-priority-select"),
+                    date = request.session.get("date"),
+                    user = request.user,
+                    time_start = time_start,
+                    time_end = time_end,
+                    group = group,
+                )
+                task.save()
+
+            if request.POST.get("action") == "edit_task":
+                task = get_object_or_404(Task, id=signing.loads(request.POST.get("task_id")))
+                task.name = name
+                task.description = request.POST.get("task-description")
+                task.priority = request.POST.get("task-priority-select")
+                task.group = group
+                task.time_start = time_start
+                task.time_end = time_end
+                task.save()
+                task.taskresources_set.all().delete()
 
             for resource, amount in trft.items():
                 task_resource = TaskResources(
-                    task = new_task,
+                    task = task,
                     resource = resource,
                     amount = amount
                 )
                 task_resource.save()
 
-            return redirect("tasks")
-        
+            return redirect("tasks")     
         else:
             date = request.GET.get("date")
             date = request.session.get("date") if not date else date

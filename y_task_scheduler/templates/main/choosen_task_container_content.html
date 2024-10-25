@@ -17,9 +17,9 @@
         <div class="task-info-resources task-info-item">
             <div class="task-info-header">Resources: </div>
             <div class="task-info-resources-content task-info-item-content">
-                {% if choosen_task.resources.all %}
-                    {% for resource in choosen_task.resources.all %}
-                        <a href="">{{ resource }}{% if not forloop.last %}, {% endif %}</a>
+                {% if choosen_task.taskresources_set.all %}
+                    {% for task_res in choosen_task.taskresources_set.all %}
+                        <a href="">{{ task_res.resource.name }} ({{ task_res.amount }}){% if not forloop.last %}, {% endif %}</a>
                     {% endfor %}
                 {% else %}
                     No resources
@@ -42,7 +42,7 @@
                 {% if current_time.date > choosen_task.date or current_time.time > choosen_task.time_end %}         
                     <span style="color: red;">!</span> 
                 {% endif %}
-                {{ choosen_task.time_start }} - {{ choosen_task.time_end }}
+                {{ choosen_task.time_start|date:'H:i' }} - {{ choosen_task.time_end|date:'H:i' }}
             </div>
         </div>
     {% endif %}

@@ -1,11 +1,15 @@
-<form id="add-task-form" method="POST">
+<form id="add-edit-task-form" method="POST">
     {% csrf_token %}
+    <input type="hidden" name="action" value="{% if task %}edit_task{% else %}add_task{% endif %}">
+    {% if task %}
+        <input type="hidden" name="task_id" value="{{task.get_encrypted_id}}">
+    {% endif %}
     <div class="task-info-container-header">
-        <input id="task-info-name" type="text" name="task-name" placeholder="Name">        
+        <input id="task-info-name" type="text" name="task-name" placeholder="Name" value="{% if task %}{{task.name}}{% endif %}">        
         <div id="task-info-priority">
             <select class="task-info-item-content" name="task-priority-select" id="task-priority-select">
                 {% for pr_num, pr_val in priorities %}
-                    <option value="{{ pr_num }}">{{ pr_val }}</option>
+                    <option value="{{ pr_num }}" {% if pr_num == task.priority %}selected{% endif %}>{{ pr_val }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -13,16 +17,17 @@
     <span class="separator first"></span>
     <div class="task-info-container">    
         <div class="task-info-description task-info-item">
-            <div class="task-info-header">Description: </div>                  
-            
+            <div class="task-info-header">Description: </div>                           
             <textarea class="task-info-description-content task-info-item-content" 
-            name="task-description" id="task-description" placeholder="Description"></textarea>
-
+            name="task-description" id="task-description" placeholder="Description">{{task.description}}</textarea>
         </div>
 
         <div class="task-info-resources task-info-item">
             <div class="task-info-header">Resources: </div>
-            <div class="task-info-resources-content task-info-item-content">            
+            <div class="task-info-resources-content task-info-item-content"> 
+                {% for task_res in task_resources %}
+                    {{task_res.resource.name}} ({{task_res.amount}}){% if not forloop.last %}, {% endif %}    
+                {% endfor %}           
             </div>
         </div>
         <div class="task-info-item">
@@ -53,31 +58,26 @@
         <div class="task-info-group task-info-item">
             <div class="task-info-header">Group: </div>        
             <select class="task-info-group-content task-info-item-content" name="task-group-select" id="task-group-select">
+                <option value="None">No group</option>
                 {% if groups %}
                     {% for group in groups %}
-                        <option value="group.get_encrypted_id">{{ group }}</option>
+                        <option value="{{group.get_encrypted_id}}" {% if task.group and task.group == group %}selected{% endif %}>{{ group }}</option>
                     {% endfor %}
-                {% else %}
-                    <option value="None">No group</option>
                 {% endif %}
             </select>      
         </div>
         <div class="task-info-time task-info-item">
-            <div class="task-info-header">Time: </div>
-            
+            <div class="task-info-header">Time: </div>         
                 <div class="task-time-container task-info-item-content">
                     <div class="item">
                         <label for="task-time-start">From:</label>
-                        <input type="time" name="task-time-start" id="task-time-start">
+                        <input type="time" name="task-time-start" id="task-time-start" value="{{task.time_start|date:'H:i'}}">
                     </div>
                     <div class="item">
                         <label for="task-time-end">To:</label>
-                        <input type="time" name="task-time-end" id="task-time-end">
-                    </div>
-                    
-                    
-                </div>
-            
+                        <input type="time" name="task-time-end" id="task-time-end" value="{{task.time_end|date:'H:i'}}">
+                    </div>             
+                </div>       
         </div>     
     </div>
     <button id="submit-adding-task-button" type="submit">Save Task</button>

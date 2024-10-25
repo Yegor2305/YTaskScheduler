@@ -63,6 +63,21 @@ $(document).ready(
                 }
             })
         })
+
+        $(document).on('click', '.edit-task-button', function(){
+            let taskId = $(this).data('task-id');
+            $.ajax({
+                url: '/tasks',
+                method: 'GET',
+                data: {
+                    'action': 'edit_task',
+                    'task_id': taskId
+                },
+                success: function(response) {
+                    $('.task-container').html(response);
+                }
+            })
+        })
     }
 )
 
