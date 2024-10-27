@@ -1,0 +1,208 @@
+.left-side, .right-side{
+    width: 10%;
+    height: 100%;
+}
+
+.content{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.info-container{
+    width: 100%;
+    /* flex: 8; */
+    box-sizing: border-box;
+    height: 100%;
+    padding: 10px 30px 0px 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    color: var(--primary-color);
+}
+
+.groups-container, .resources-container{
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 40%;
+    max-width: 40%;
+    padding: 20px;
+    background-color: var(--third-color); 
+    border-radius: 20px;
+    max-height: calc(100% - 20px);
+}
+
+.groups-container-header, .resources-container-header{
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+.group-choose-field, .resource-choose-field{
+    max-width: 80%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    font-size: 30px;
+    font-weight: 800; 
+    height: 48px;
+}
+
+.group-choose-field select, .resource-choose-field select{
+    margin: 0 20px;
+    padding-bottom: 2px;
+    flex: 1;
+    color: var(--primary-color);
+    font-size: 30px;
+    font-weight: 800; 
+    background-color: transparent;
+    border: none;
+}
+
+.group-choose-field select:focus, #group-name, #resource-name, .resource-choose-field select:focus{
+    outline: none;
+}
+
+#group-name, #resource-name{
+    width: 50%;
+    margin-left: 22px;
+    padding-bottom: 3px;
+    border: none;
+    background-color: transparent;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.separator{
+    display: block;
+    height: 5px;
+    width: 97%;
+    background-color: var(--separation-color);
+    border-radius: 150px;
+}
+
+.separator.first{
+    background-color: var(--primary-color);
+    width: 100%;
+}
+
+.add-group-button, .add-resource-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 30px;
+    font-weight: 800;
+    border: 4px solid var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.add-group-button:hover, .add-resource-button:hover{
+    transform: scale(1.1);
+}
+
+.group-info-container, .resource-info-container{
+    align-items: center;
+}
+
+.group-info-item, .resource-info-item {
+    display: flex;
+    flex-direction: row;
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+.group-info-header, .resource-info-header{
+    flex: 1;
+}
+
+.group-info-item-content, .resource-info-item-content{
+    flex: 2;
+    padding: 0px 5px;
+    line-height: 1.5;
+    height: calc(2 * 1.5em);
+    overflow-x: hidden;
+    overflow-y: auto;
+    word-break: break-word;
+    background-color: var(--fourth-color);
+    border: 2px solid var(--separation-color);
+    border-radius: 10px;
+}
+
+.control-button{
+    width: 100%;
+    margin-top: auto;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid var(--separation-color);
+    border-radius: 10px;
+    background-color: var(--fourth-color);
+}
+
+#edit-group-button, #edit-resource-button{
+    margin-right: 10px;
+}
+
+#save-group-button, #save-resource-button{
+    margin-left: 10px;
+}
+
+.control-button:hover{
+    background-color: var(--separation-color);
+}
+
+.control-button:disabled{
+    cursor: not-allowed;
+}
+
+.control-button:disabled:hover{
+    background-color: inherit;
+}
+
+textarea{
+    color: var(--primary-color);
+    font-size: 20px;
+    resize: none;
+}
+
+.group-info-color-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#color-select, #price{
+    background-color: transparent;
+    color: var(--fourth-color);
+    border: none;
+}
+
+#price{
+    color: var(--primary-color);
+    width: 80px;
+    font-size: 20px;
+    position: relative;
+}
+
+#price::before{
+    position: absolute;
+    content: '$';
+    right: 50%;
+    top: 50%;
+    width: 10px;
+}
+
+#color-select:focus, #price:focus{
+    outline: none;
+}
+
+

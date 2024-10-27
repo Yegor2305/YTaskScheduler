@@ -1,24 +1,23 @@
 {% extends 'main/base.html' %}
 {% load static %}
 
-{% block style %} <link rel="stylesheet" href="{% static 'main/css/tasks.css' %}"> {% endblock %}
-
-{% load static %}
+{% block style %} <link rel="stylesheet" href="{% static 'main/css/groups_and_resources.css' %}"> {% endblock %}
 {% block script %} 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="{% static 'main/js/tasks.js' %}" defer></script> 
+    <script src="{% static 'main/js/groups_and_resources.js' %}" defer></script> 
 {% endblock %}
+
 {% block title %} {{ title }} {% endblock %}
 
 {% block content %}  
     <div class="content">
         <div class="left-side"></div>
         <div class="info-container">
-            <div class="today-tasks-container">
-                {% include 'main/containers_content/today_tasks_container_content.html' %}
+            <div class="groups-container">
+                {% include 'main/containers_content/groups_container_content.html' %}
             </div>
-            <div class="task-container">
-                {% include 'main/containers_content/choosen_task_container_content.html' %}
+            <div class="resources-container">
+                {% include 'main/containers_content/resources_container_content.html' %}
             </div>
         </div>
         <div class="right-side"></div>

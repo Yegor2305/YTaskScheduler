@@ -7,6 +7,9 @@ from accounts.models import User
 class Color(models.Model):
     value = models.CharField(max_length=100)
 
+    def get_encrypted_id(self):
+        return signing.dumps(self.id)
+
     def __str__(self):
         return f"{self.value}"
 

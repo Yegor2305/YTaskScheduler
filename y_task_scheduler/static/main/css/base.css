@@ -61,18 +61,31 @@ a{
     text-align: center;
 }
 
-.left-part{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
 .nav-panel{
     margin-left: 40px;
 }
 
-/* .auth-panel{
-    border: 3px solid #C7FFD8;
-    padding: 2px;
-    border-radius: 30px;
-} */
+.left-part{
+    display: flex;
+    flex-direction: row;
+    align-items: center
+}
+
+::-webkit-scrollbar {
+    width: 10px;    
+}
+  
+::-webkit-scrollbar-track {
+    margin: 10px 0px 10px 40px;
+    background: #f1f1f1;
+    border-radius: 20px;
+}
+  
+::-webkit-scrollbar-thumb {
+    background: lightgrey;
+    border-radius: 20px;
+}
+  
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

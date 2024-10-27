@@ -1,6 +1,11 @@
 {% load static %}
 <div class="today-tasks-container-header">
-    <div class="date-field">{{ date|date:"M. d, Y" }}</div>
+    <div class="date-field">
+        <form method="get">
+            <input type="date" name="date" id="date" onchange="this.form.submit()" value="{{ date|date:'Y-m-d' }}">
+        </form>
+        
+    </div>
     <button type="button" class="add-task-button">+</button>
 </div>
 <span class="separator first"></span>

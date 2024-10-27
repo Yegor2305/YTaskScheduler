@@ -1,0 +1,68 @@
+{% load static %}
+{% if action %} 
+    <form method="POST"> 
+    {% csrf_token %}
+    <input type="hidden" name="action" value="{{action}}_group">
+    {% if action == 'edit' %}
+    <input type="hidden" name="group_id" value="{{ choosen_group.get_encrypted_id }}">
+    {% endif %}
+{% endif %}
+    <div class="groups-container-header">
+        <div class="group-choose-field">
+            {% if not action %}
+                <label for="group-select">Group: </label>
+                <select name="group-select" id="group-select">
+                    {% if groups  %}
+                        {% for group in groups %}
+                            <option value="{{ group.get_encrypted_id }}"
+                            {% if group == choosen_group %} selected {% endif %}>{{ group }}</option>
+                        {% endfor  %}
+                    {% endif %}
+                </select>
+            {% else %}
+                <label for="group-name">Group: </label>
+                <input type="text" name="group-name" id="group-name"
+                placeholder="Name"
+                value="{% if action == 'edit' %}{{ choosen_group }}{% endif %}">
+            {% endif %}
+        </div>
+        <button type="button" class="add-group-button">+</button>
+    </div>
+    <span class="separator first"></span>
+    <div class="group-info-content">
+        <div class="group-info-description group-info-item">
+            <div class="group-info-header">Description: </div>                    
+            {% if action %}
+                <textarea class="group-info-description-content group-info-item-content" placeholder="Description"
+                name="description" id="description">{% if action == 'edit' %}{{ choosen_group.description }}{% endif %}</textarea>
+            {% else %}
+                <div class="group-info-description-content group-info-item-content">
+                    {% if choosen_group %}{{choosen_group.description}}{% endif %}
+                </div>            
+            {% endif %}         
+        </div>
+        <div class="group-info-color group-info-item">
+            <div class="group-info-header">Color: </div>
+            <div class="group-info-color-content group-info-item-content"       
+                {% if choosen_group %}style="background-color:{{choosen_group.color}}"
+                {% else %}style="background-color:{{colors.0}}"             
+                {% endif %}>
+                {% if action %}
+                    <select name="color-select" id="color-select" onchange="changeColor()">
+                        {% for color in colors %}
+                            <option value="{{color}}" 
+                            {% if action == 'edit' and choosen_group.color == color %} selected {%endif%}>{{ color }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}   
+            </div>
+        </div> 
+        <div class="group-info-item">
+            <button type="button" id="edit-group-button" class="control-button" data-group-id="{{ choosen_group.get_encrypted_id }}"
+            {% if action == 'edit' %} disabled {% endif %}>Edit</button>
+            <button type="button" id="delete-group-button" class="control-button"
+            data-group-id="{{ choosen_group.get_encrypted_id }}"
+            {% if action %} disabled {% endif %}>Delete</button>
+            <button type="submit" id="save-group-button" class="control-button" {% if not action %} disabled {% endif %}>Save</button>
+        </div> 
+    </div>

@@ -4,7 +4,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.core import signing
-from .models import Task, Resource, TaskResources
+from .models import Task, Resource, TaskResources, Color, Group
 from .forms import temp_resources_for_task as trft
 import datetime as dt
 
@@ -13,13 +13,11 @@ def index(request):
     return render(request, 'main/index.html', {"title": "Home"})
 
 def log_out(request):
-    print(request.user.is_authenticated)
     logout(request)
-    print(request.user)
     return redirect('home')
 
 @login_required
-def personal_page(request):
+def tasks_page(request):
     if request.user.is_superuser:
         logout(request=request)
         return redirect("sign-in")
@@ -59,11 +57,11 @@ def personal_page(request):
           
             tasks = get_tasks(request.user, date)
             
-            html = render_to_string('main/today_tasks_container_content.html', {'tasks': tasks, 'date': date})
+            html = render_to_string('main/containers_content/today_tasks_container_content.html', {'tasks': tasks, 'date': date})
             return HttpResponse(html)
         else:
             if action == "show":
-                html = render_to_string('main/choosen_task_container_content.html', 
+                html = render_to_string('main/containers_content/choosen_task_container_content.html', 
                                         {'choosen_task': task, "current_time": current_time, "date": date})
                 return HttpResponse(html)
             if action == "add_task" or action == "edit_task":
@@ -150,6 +148,120 @@ def personal_page(request):
             }
                 
             return render(request, 'main/tasks.html', context=context)
+
+@login_required
+def groups_and_resources_page(request):
+    if request.user.is_superuser:
+        logout(request=request)
+        return redirect("sign-in")
+    
+    groups = request.user.groups.all()
+    resources = request.user.resources.all()
+    choosen_group = groups[0] if groups else None
+    choosen_resource = resources[0] if groups else None
+    context = {
+        "title": "Groups & Resources",
+        "groups": groups,
+        "resources": resources, 
+        "choosen_group": choosen_group,   
+        "choosen_resource": choosen_resource,   
+    }
+
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        action = request.GET.get("action")
+        template_name = ""
+        if action == "group_changed":
+            context["choosen_group"] = groups.get(id=signing.loads(request.GET.get("group_id")))
+            template_name = "main/containers_content/groups_container_content.html"
+
+        if action == "edit_group" or action == "add_group" or action == "delete_group":
+            if action == "edit_group":
+                context["choosen_group"] = groups.get(id=signing.loads(request.GET.get("group_id")))
+                context["action"] = "edit"
+            elif action == "add_group":
+                context.pop("choosen_group", None)
+                context["action"] = "add"
+            else:
+                group = groups.get(id=signing.loads(request.GET.get("group_id")))
+                group.delete()
+                context["groups"] = request.user.groups.all()
+                context["choosen_group"] = context["groups"][0]
+
+            colors = Color.objects.all()
+            context["colors"] = colors
+            template_name = "main/containers_content/groups_container_content.html"
+    
+        if action == "resource_changed":
+            template_name = "main/containers_content/resources_container_content.html"
+            context["choosen_resource"] = resources.get(id=signing.loads(request.GET.get("resource_id")))
+
+        if action == "edit_resource" or action == "add_resource" or action == "delete_resource":
+            if action == "edit_resource":
+                context["choosen_resource"] = resources.get(id=signing.loads(request.GET.get("resource_id")))
+                context["action"] = "edit"
+            elif action == "add_resource":
+                context.pop("choosen_resource", None)
+                context["action"] = "add"
+            else:
+                resource = resources.get(id=signing.loads(request.GET.get("resource_id")))
+                resource.delete()
+                context["resources"] = request.user.resources.all()
+                context["choosen_resource"] = context["resources"][0]
+
+            template_name = "main/containers_content/resources_container_content.html"
+
+        html = render_to_string(request=request, template_name=template_name, context=context)
+        return HttpResponse(html)
+    else:
+        if request.method == "POST":
+            action = request.POST.get("action")
+
+            if action == "edit_group" or action == "add_group":
+                group = None
+                name = request.POST.get("group-name")
+                name = name if name.strip() != "" else "nameless" 
+                description = request.POST.get("description")
+                color = Color.objects.get(value=request.POST.get("color-select"))
+                if action == "edit_group":
+                    group_id = request.POST.get("group_id")
+                    group = groups.get(id=signing.loads(group_id))       
+                    group.name = name
+                    group.description = description
+                    group.color = color
+                else:
+                    group = Group(
+                        name = name,
+                        description = description,
+                        color = color,
+                        user = request.user
+                    )
+                group.save()
+
+            if action == "edit_resource" or action == "add_resource":
+                resource = None
+                name = request.POST.get("resource-name")
+                name = name if name.strip() != "" else "nameless" 
+                description = request.POST.get("description")
+                price = float(request.POST.get("price"))
+                price = price if price >= 0 else 0
+                if action == "edit_resource":
+                    resource_id = request.POST.get("resource_id")
+                    resource = resources.get(id=signing.loads(resource_id))
+                    resource.name = name
+                    resource.description = description
+                    resource.price = price
+                else:
+                    resource = Resource(
+                        name = name,
+                        description = description,
+                        price = price,
+                        user = request.user
+                    )
+                resource.save()
+
+            return redirect("groups_and_resources")
+                
+        return render(request, "main/groups_and_resources.html", context=context)
 
 def another(request):
     return render(request, 'main/about.html', {"title": "About"})
